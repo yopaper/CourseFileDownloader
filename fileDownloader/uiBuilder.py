@@ -10,12 +10,14 @@ open_excel_button = tk.Button( window,
     text="載入Excel"
 )
 open_scv_button = tk.Button( window,
-    text="載入SCV(未完成)"
+    text="載入SCV"
 )
 start_download_github_buton= tk.Button(window,
                                 text="用Github網址下載", bg="#CCFFCC")
 start_download_github_account_button = tk.Button(window,
                                                  text="用Github帳號名稱下載", bg="#DDFFDD")
+start_download_target_file_button = tk.Button(window,
+                                              text = "直接下載目標檔案")
 start_download_youtube_button = tk.Button(window,
                                           text="下載Youtube影片(未完成)", bg="#FFDDDD")
 select_save_path_buton = tk.Button(window,
@@ -46,13 +48,16 @@ def init():
     open_excel_button.grid(column=0, row=1)
     open_excel_button.config(command=data.select_excel)
     open_scv_button.grid(column=1, row=1)
+    open_scv_button.config( command=data.select_csv )
     select_save_path_buton.grid(column=2, row=1)
     select_save_path_buton.config( command=data.select_saved_path )
     start_download_github_buton.grid(column=3, row=1, columnspan=2)
     start_download_github_buton.config( command=downloader.download_github_by_url )
     start_download_github_account_button.grid(column=3, row=2, columnspan=2)
     start_download_github_account_button.config( command=downloader.download_github_by_account )
-    start_download_youtube_button.grid(column=3, row=0, columnspan=2)
+    start_download_target_file_button.grid( column=3, row=0, columnspan=2 )
+    start_download_target_file_button.config( command=downloader.download_file_from_url )
+    #start_download_youtube_button.grid(column=3, row=0, columnspan=2)
 
     tk.Label(window, text="儲存路徑").grid(column=0, row=0)
     tk.Label(window, text="Github Repository名稱", relief="solid", bd=1, width=24, anchor="e").grid(column=5,row=2, columnspan=2)

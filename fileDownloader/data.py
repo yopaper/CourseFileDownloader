@@ -41,7 +41,7 @@ def select_saved_path():
     uiBuilder.msg("儲存路徑設為:{0}".format(saved_path.get()))
 #-------------------------------------------------
 def select_excel():
-    def load_excel()->(openpyxl.Workbook, str):
+    def load_excel()->tuple[openpyxl.Workbook, str]:
         excel_path = filedialog.askopenfile().name
         if( os.path.exists(excel_path) ):
             print("File Exists!")
@@ -93,6 +93,33 @@ def select_excel():
         uiBuilder.msg("右方為檔案預覽畫面")
         uiBuilder.msg("共有{0}筆資料".format( len(file_data) ))
         uiBuilder.msg("載入完成!")
+    except Exception as e:
+        uiBuilder.msg("載入失敗!")
+        uiBuilder.msg(str(e))
+        raise Exception( str(e) )
+#-------------------------------------------------
+def select_csv():
+    def open_csv_file()->str:
+        csv_path = filedialog.askopenfile().name
+        return csv_path
+    #..............................................
+    def load_file():
+        file_data.clear()
+        with open( file=file_path, mode="r" )as file_reader:
+            while(True):
+                line_content = file_reader.readline()
+                if( line_content==None or len( line_content ) <= 0 ):break
+                print( line_content )
+                row_data = line_content.split( "," )
+                file_data.append( row_data )
+    #..............................................
+    try:
+        uiBuilder.msg("-----------------------------")
+        uiBuilder.msg("選擇 CSV 檔")
+        file_path = open_csv_file()
+        load_file()
+        display_file_data()
+        set_file_path( file_path )
     except Exception as e:
         uiBuilder.msg("載入失敗!")
         uiBuilder.msg(str(e))

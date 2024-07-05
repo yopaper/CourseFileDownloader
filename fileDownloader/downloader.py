@@ -23,6 +23,7 @@ def start_download():
     uiBuilder.msg("完成前請勿進行其他操作!")
     check_save_path()
 #-------------------------------------------------------
+# 直接由URL下載壓縮檔
 def download_github_by_url():
     def download_thread(index:int, none_counter:int, none_limit:int):
         try:
@@ -59,6 +60,7 @@ def download_github_by_url():
         uiBuilder.msg( str(e) )
         uiBuilder.msg("下載失敗! 下載終止!")
 #-------------------------------------------
+# 由帳號名稱下載壓縮檔
 def download_github_by_account():
     def download_thread(index:int, none_counter:int, none_limit:int):
         row_data = data.file_data[index]
@@ -95,6 +97,44 @@ def download_github_by_account():
         uiBuilder.msg( str(e) )
         uiBuilder.msg("下載失敗! 下載終止!")
 #-------------------------------------------
+# 直接下載目標URL的檔案
+def download_file_from_url():
+    def download_thread(index:int, none_counter:int, none_limit:int):
+        try:
+            current_row = data.file_data[index]
+            github_url = current_row[ url_index ]
+
+            filename = combine_file_name( name_format, col_index, current_row)
+            
+            if( filename != None and github_url != None ):
+                download_web_file( filename, github_url )
+                none_counter = 0
+            else:
+                none_counter += 1
+                uiBuilder.msg( "空列資料:{0}/{1}".format(none_counter, none_limit) )
+
+        except Exception as e:
+            uiBuilder.msg( "單一檔案下載失敗!" )
+        
+        if( index < data_number-1 and none_counter<none_limit):
+            t = Timer(0.001, download_thread, (index+1,none_counter, none_limit))
+            t.start()
+        else:
+            uiBuilder.msg("下載完成!")
+    #.................................................
+    try:
+        start_download()
+        name_format, col_index = get_github_filename_format_index()
+        data_number = len( data.file_data )
+        url_index = data.url_index.get()
+        
+        t = Timer( 0.5, download_thread, (data.skip_row_number.get(), 0, get_none_data_limiting()) )
+        t.start()
+    except Exception as e:
+        uiBuilder.msg( str(e) )
+        uiBuilder.msg("下載失敗! 下載終止!")
+#-------------------------------------------
+
 def check_save_path():
     save_path = data.saved_path.get()
     if( not os.path.exists(save_path) ):
@@ -111,12 +151,12 @@ def combine_file_name(
         col_content.append( col )
     return name_format.format( *col_content ) + tail_filename
 #-------------------------------------------
-def get_github_filename_format_index()->(str, list[int]):
+def get_github_filename_format_index()->tuple[ str, list[int] ]:
     name_format, col_index = split_filename_format()
     name_format = os.path.join( data.saved_path.get(), name_format )
     return name_format, col_index
 #-------------------------------------------
-def split_filename_format()->(str, list[int]):
+def split_filename_format()->tuple[ str, list[int] ]:
     format_error = Exception("檔案名稱格式錯誤!")
     filename = data.file_name_format.get()
     col_index = []; splitname = []
